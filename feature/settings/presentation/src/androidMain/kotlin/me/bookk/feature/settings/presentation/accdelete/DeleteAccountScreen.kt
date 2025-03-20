@@ -1,9 +1,9 @@
-package me.bookk.feature.settings.presentation.contactus
+package me.bookk.feature.settings.presentation.accdelete
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -15,24 +15,16 @@ import dev.icerock.moko.resources.compose.localized
 import me.bookk.designsystem.components.ActionButton
 import me.bookk.designsystem.components.AppCard
 import me.bookk.designsystem.components.AppTopBar
-import me.bookk.designsystem.components.ObserveNavigation
 import me.bookk.designsystem.components.ObserveNotifications
 import me.bookk.designsystem.components.StateSwitch
-import me.bookk.designsystem.components.TextField
 import me.bookk.designsystem.components.TopBarSize
 import me.bookk.designsystem.theme.AppTheme
 import me.bookk.designsystem.theme.ThemeMode
-import me.bookk.designsystem.theme.color.LocalColors
 import me.bookk.feature.settings.presentation.navigation.LocalNavigation
 
 @Composable
-internal fun ContactUsScreen(state: ContactUsState) {
+internal fun DeleteAccountScreen(state: DeleteAccountState) {
     ObserveNotifications(state.notifications)
-    ObserveNavigation(state.navigation) {
-        when (it) {
-            ContactUsNavigationDestination.Back -> LocalNavigation.current.navigateBack()
-        }
-    }
     Scaffold(
         topBar = {
             AppTopBar(
@@ -45,30 +37,23 @@ internal fun ContactUsScreen(state: ContactUsState) {
             Column(
                 modifier = Modifier
                     .padding(it)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                TextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .requiredHeightIn(min = 150.dp),
-                    state = state.contactField,
-                    onValueChange = LocalContactUsEventListener.current.onTextChanged
-                )
 
+                Text(
+                    modifier = Modifier.padding(top = 24.dp),
+                    text = state.confirmationMessage.localized(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
                 AppCard {
                     StateSwitch(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        state = state.includeLogsSwitch,
-                        onCheckedChange = LocalContactUsEventListener.current.onIncludeUsageLogsCheckedChanged
+                        state = state.confirmationSwitch,
+                        onCheckedChange = LocalDeleteAccountEventListener.current.onSwitchStateChanged
                     )
                 }
 
-                Text(
-                    modifier = Modifier.padding(top = 8.dp),
-                    text = state.logsExplanationText.localized(),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = LocalColors.current.secondaryText
-                )
             }
         },
         bottomBar = {
@@ -77,19 +62,20 @@ internal fun ContactUsScreen(state: ContactUsState) {
                     .padding(bottom = 24.dp)
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth(),
-                state = state.submitButton,
-                onClick = LocalContactUsEventListener.current.onSubmitClick
+                state = state.deleteButton,
+                onClick = LocalDeleteAccountEventListener.current.onDeleteClick
             )
         }
     )
 }
 
+
 @Preview
 @Composable
 private fun PreviewDark() {
     AppTheme(themeMode = ThemeMode.DARK) {
-        ContactUsScreen(
-            state = AndroidContactUsState(ContactUsViewModel.createInitData())
+        DeleteAccountScreen(
+            state = AndroidDeleteAccountState(DeleteAccountViewModel.createInitData())
         )
     }
 }
@@ -98,8 +84,8 @@ private fun PreviewDark() {
 @Composable
 private fun PreviewLight() {
     AppTheme(themeMode = ThemeMode.LIGHT) {
-        ContactUsScreen(
-            state = AndroidContactUsState(ContactUsViewModel.createInitData())
+        DeleteAccountScreen(
+            state = AndroidDeleteAccountState(DeleteAccountViewModel.createInitData())
         )
     }
 }
