@@ -1,4 +1,4 @@
-package me.bookk.feature.clients.presentation.list
+package me.bookk.feature.clients.presentation.create
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.NavGraphBuilder
@@ -14,21 +14,19 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.uuid.Uuid
 
-internal fun NavGraphBuilder.clientsListScreen(navigation: ClientsNavigation) {
-    composable<ClientsDestinations.Clients>(
+internal fun NavGraphBuilder.createClientScreen(navigation: ClientsNavigation) {
+    composable<ClientsDestinations.CreateClient>(
         typeMap = mapOf(serializableNavTypeEntry<Uuid>())
     ) {
-        val route: ClientsDestinations.Clients = it.toRoute()
-        val args = ClientsListArgs(route.id)
-        val viewModel: ClientsListViewModel = koinViewModel { parametersOf(args) }
+        val route: ClientsDestinations.CreateClient = it.toRoute()
+        val viewModel: CreateClientViewModel = koinViewModel { parametersOf(route.businessId) }
         CompositionLocalProvider(LocalNavigation provides navigation) {
-            ClientsListScreen(viewModel.uiState)
+            CreateClientScreen(viewModel.uiState)
             ObserveNotifications(viewModel.uiState.notifications)
             ObserveNavigation(viewModel.uiState.navigation) {
                 when (it) {
-                    is ClientsListDestination.AddClient -> navigation.toAddClient(it.businessId)
-                    is ClientsListDestination.ClientDetails -> navigation.toClientDetails(it.clientId)
-                    ClientsListDestination.Back -> navigation.onBack()
+                    CreateClientDestination.Back -> navigation.onBack()
+                    is CreateClientDestination.Details -> {}
                 }
             }
         }
