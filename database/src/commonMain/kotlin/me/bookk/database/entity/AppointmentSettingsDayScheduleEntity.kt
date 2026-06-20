@@ -7,8 +7,8 @@ import androidx.room.Index
 import kotlin.uuid.Uuid
 
 @Entity(
-    tableName = "appointment_settings_day_off",
-    primaryKeys = ["settingsId", "start", "end"],
+    tableName = "appointment_settings_day_schedule",
+    primaryKeys = ["settingsId", "dayOfWeek"],
     foreignKeys = [
         ForeignKey(
             entity = AppointmentSettingsEntity::class,
@@ -19,8 +19,8 @@ import kotlin.uuid.Uuid
     ],
     indices = [Index("settingsId")]
 )
-class AppointmentSettingsDayOffEntity(
+class AppointmentSettingsDayScheduleEntity(
     val settingsId: Uuid,
-    val start: String,
-    val end: String
+    val dayOfWeek: String,
+    val isActive: Boolean
 )

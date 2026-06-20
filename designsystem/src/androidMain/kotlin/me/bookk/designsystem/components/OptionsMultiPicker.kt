@@ -7,27 +7,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.compose.localized
+import kotlinx.coroutines.launch
 import me.bookk.designsystem.theme.typography.active
-import me.bookk.designsystem.uistate.MultiPickerState
+import me.bookk.designsystem.uistate.OptionsMultiPickerState
 import me.bookk.designsystem.uistate.PickerPresentation
 
 @Composable
-fun <T : PickerPresentation> MultiPicker(
-    state: MultiPickerState<T>,
+fun <T : PickerPresentation> OptionsMultiPicker(
+    state: OptionsMultiPickerState<T>,
     modifier: Modifier = Modifier,
-    pickerContent: @Composable () -> Unit,
     itemContent: @Composable (T, () -> Unit) -> Unit
 ) {
-    var isPickerVisible by remember { mutableStateOf(false) }
+    var isDialogVisible by remember { mutableStateOf(false) }
     Column(modifier) {
         Header(state.pickerTitle.localized())
         AppCard {
@@ -42,7 +44,7 @@ fun <T : PickerPresentation> MultiPicker(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp),
-                        onClick = { isPickerVisible = true }
+                        onClick = { isDialogVisible = true }
                     ) {
                         Text(
                             state.addItemText.localized(),
@@ -55,7 +57,33 @@ fun <T : PickerPresentation> MultiPicker(
             }
         }
     }
-    if (isPickerVisible) {
-        pickerContent()
+    if (isDialogVisible) {
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val scope = rememberCoroutineScope()
+        SelectorBottomSheet(
+            sheetState = sheetState,
+            title = state.pickerTitle,
+            data = state.options,
+            onItemPicked = {
+                scope.launch {
+                    sheetState.hide()
+                    state.onItemsPicked(listOf(it))
+                    isDialogVisible = false
+                }
+            },
+            onDismiss = {
+                scope.launch {
+                    sheetState.hide()
+                    isDialogVisible = false
+                }
+            },
+        ) { _, item, isSelected, onClick ->
+            StandardSelectorItem(
+                item = item,
+                isSelected = isSelected,
+                stringify = { it.displayName.localized() },
+                onClick = { onClick(item) }
+            )
+        }
     }
 }

@@ -3,15 +3,16 @@ import SwiftUI
 
 @Observable
 @MainActor
-class IOSMultiPickerState: IOSViewState, @MainActor MultiPickerState, NativeStateRepresentation {
+class IOSOptionsMultiPickerState: IOSViewState, @MainActor OptionsMultiPickerState, NativeStateRepresentation {
 
-    typealias SwiftType = IOSMultiPickerState
-    typealias KotlinType = MultiPickerState
+    typealias SwiftType = IOSOptionsMultiPickerState
+    typealias KotlinType = OptionsMultiPickerState
 
     var pickerTitle: any StringDesc
-	var selectedItems: [PickerPresentation]
-	var onItemsPicked: ([PickerPresentation]) -> Void
-	var onItemsRemoveRequested: ([PickerPresentation]) -> Void
+    var options: [PickerPresentation]
+    var selectedItems: [PickerPresentation]
+    var onItemsPicked: ([PickerPresentation]) -> Void
+    var onItemsRemoveRequested: ([PickerPresentation]) -> Void
     var addItemText: any StringDesc
     var isEditable: Bool
 
@@ -25,6 +26,7 @@ class IOSMultiPickerState: IOSViewState, @MainActor MultiPickerState, NativeStat
         isEditable: Bool = true
     ) {
         self.pickerTitle = pickerTitle
+        self.options = options
         self.selectedItems = selectedItems
         self.onItemsPicked = onItemsPicked
         self.onItemsRemoveRequested = onItemsRemoveRequested
@@ -32,13 +34,17 @@ class IOSMultiPickerState: IOSViewState, @MainActor MultiPickerState, NativeStat
         self.isEditable = isEditable
     }
 
-    func replaceSelected(items: [PickerPresentation]) {
-        self.selectedItems = items
+    func replaceOptions(options: [PickerPresentation]) {
+        self.options = options
+    }
+
+    func replaceSelected(selected: [PickerPresentation]) {
+        self.selectedItems = selected
     }
 }
 
-extension MultiPickerState {
-    func impl() -> IOSMultiPickerState {
-        return self as! IOSMultiPickerState
+extension OptionsMultiPickerState {
+    func impl() -> IOSOptionsMultiPickerState {
+        return self as! IOSOptionsMultiPickerState
     }
 }
