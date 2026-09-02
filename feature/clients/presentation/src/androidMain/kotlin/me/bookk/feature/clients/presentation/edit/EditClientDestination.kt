@@ -1,4 +1,4 @@
-package me.bookk.feature.clients.presentation.details
+package me.bookk.feature.clients.presentation.edit
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.NavGraphBuilder
@@ -14,19 +14,22 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.uuid.Uuid
 
-internal fun NavGraphBuilder.clientDetailsScreen(navigation: ClientsNavigation) {
-    composable<ClientsDestinations.ClientDetails>(
+internal fun NavGraphBuilder.editClientScreen(navigation: ClientsNavigation) {
+    composable<ClientsDestinations.EditClient>(
         typeMap = mapOf(serializableNavTypeEntry<Uuid>())
     ) {
-        val route: ClientsDestinations.ClientDetails = it.toRoute()
-        val viewModel: ClientDetailsViewModel = koinViewModel { parametersOf(route.id) }
+        val route: ClientsDestinations.EditClient = it.toRoute()
+        val viewModel: EditClientViewModel = koinViewModel { parametersOf(route.id) }
         CompositionLocalProvider(LocalNavigation provides navigation) {
-            ClientDetailsScreen(viewModel.uiState)
+            EditClientScreen(viewModel.uiState)
             ObserveNotifications(viewModel.uiState.notifications)
             ObserveNavigation(viewModel.uiState.navigation) {
                 when (it) {
-                    ClientDetailsDestination.Back -> navigation.onBack()
-                    is ClientDetailsDestination.Edit -> navigation.toEditClient(it.id)
+                    EditClientDestination.Back -> navigation.onBack()
+                    EditClientDestination.Deleted -> {
+                        navigation.onBack()
+                        navigation.onBack()
+                    }
                 }
             }
         }
